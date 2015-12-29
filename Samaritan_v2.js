@@ -272,17 +272,25 @@ function Samaritan($settings) {
 
 	this.spy = function($func, $params, $on, $target) {
 		$(document).ready(function() {
-			$($target).on($on, function() {
+			if (isEmpty($on)) {
 				spied.push({
 					'function' : $func,
 					'params' : $params,
-					'on' : $on,
-					'target' : $target,
 					'result' : eval($func + '(' + $params + ')')
 				});
-			});
-		});
+			} else {
+				$($target).on($on, function() {
+					spied.push({
+						'function' : $func,
+						'params' : $params,
+						'on' : $on,
+						'target' : $target,
+						'result' : eval($func + '(' + $params + ')')
+					});
+				});
+			}
 
+		});
 	}
 
 	this.getSpied = function() {
