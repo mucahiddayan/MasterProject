@@ -278,6 +278,10 @@ function Samaritan($settings) {
 					'params' : $params,
 					'result' : eval($func + '(' + $params + ')')
 				});
+				observed.push(	'function:"'+$func+'"'+settings.seperator+
+						'params:"'+$params+'"'+settings.seperator+
+						'result:"'+eval($func + '(' + $params + ')')+'"'+settings.seperator
+				);
 			} else {
 				$($target).on($on, function() {
 					spied.push({
@@ -287,6 +291,13 @@ function Samaritan($settings) {
 						'target' : $target,
 						'result' : eval($func + '(' + $params + ')')
 					});
+					
+					observed.push(	'function:"'+$func+'"'+settings.seperator+
+							'params:"'+$params+'"'+settings.seperator+
+							'on:"'+$on+'"'+settings.seperator+
+							'target:"'+$target+'"'+settings.seperator+
+							'result:"'+eval($func + '(' + $params + ')')+'"'+settings.seperator
+					);
 				});
 			}
 
