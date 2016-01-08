@@ -60,7 +60,7 @@ function Samaritan($settings) {
 			'keypress', 'load', 'mousedown', 'mousemove', 'mouseout',
 			'mouseover', 'mouseup', 'resize', 'scroll', 'select', 'submit',
 			'load', 'error', 'onload', 'ready', 'hover', 'mousewheel', 'paste',
-			'pause', 'delegate', 'die', 'error',
+			'pause', 'delegate', 'die', 'error', 'select'
 
 	];
 
@@ -74,7 +74,7 @@ function Samaritan($settings) {
 			'currentTarget.ownerDocument.dir',
 			'currentTarget.ownerDocument.charset',
 			'currentTarget.parentElement.nodeName',
-			'currentTarget.parentNode.nodeName',
+			'currentTarget.parentNode.nodeName', 'currentTarget.value'
 
 	];
 
