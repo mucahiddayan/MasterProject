@@ -73,7 +73,7 @@ function Samaritan($settings) {
 			'currentTarget.ownerDocument.charset',
 			'currentTarget.ownerDocument.dir',
 			'currentTarget.ownerDocument.charset',
-			'currentTarget.parentElement.nodeName',
+			// 'currentTarget.parentElement.nodeName',
 			'currentTarget.parentNode.nodeName', 'currentTarget.value'
 
 	];
@@ -110,7 +110,8 @@ function Samaritan($settings) {
 		clearAfterSent : true,
 		send : {
 			file : 'file.php',
-			as : 'json'
+			as : 'json',
+			callback:null
 		},
 		frequency : 10000,
 		timef : true,
@@ -126,8 +127,9 @@ function Samaritan($settings) {
 	/** ********************* end of private attributes ********************** */
 
 	/** ********************* private functions ********************** */
-	var send = function($file, $data) {
+	var send = function($file, $data,$callback) {
 		var sent;
+		var callback = (!isEmpty($callback)&& typeof $callback == 'function')?$callback:null;
 		interval = setInterval(
 				function() {
 					sent = $
@@ -135,11 +137,20 @@ function Samaritan($settings) {
 								data : $data,
 								seperator : settings.seperator
 							})
+							/*.ajax({
+								url:$file,
+								data:$data,
+								beforeSend: function(){
+									console.warn(typeof $data);
+								},
+
+							})*/
 							.done(
 									function(data) {
 										console.debug('Data has been sent to "'
 												+ $file + '"');
-										// alert(data);
+										console.log(data);
+										callback;
 										if (settings.clearAfterSent) {
 											try {
 												clear();
@@ -149,9 +160,7 @@ function Samaritan($settings) {
 											}
 											return true;
 										}
-										/*
-										 * console.log(observed);
-										 */
+										
 									})
 							.fail(
 									function(xhr) {
@@ -199,8 +208,7 @@ function Samaritan($settings) {
 				setTimeout(function() {
 					started = true;
 					observe();
-					send(settings.send.file, toJSON(observed,
-							settings.seperator));
+					send(settings.send.file, observed,settings.send.callback);
 					started = true;
 				}, 10);
 			} catch (err) {
@@ -218,18 +226,14 @@ function Samaritan($settings) {
 	}
 
 	var clear = function() {
-		try {
-			cache = $.extend(true, cache, observed);
-			observed.length = 0;
-			console.debug('Cached');
-		} catch (err) {
-			console.error(err);
-		}
+		cache = $.extend(true, cache, observed);
+		observed.length = 0;
+		console.debug('Cached');		
 	}
 
 	var recompose = function(obj, string) {
 		var parts = (typeof string != 'function') ? string.split('.') : '';
-		var newObj = obj[parts[0]];
+		var newObj = (!isEmpty(parts))?obj[parts[0]]:'';
 		if (parts[1]) {
 			parts.splice(0, 1);
 			var newString = parts.join('.');
