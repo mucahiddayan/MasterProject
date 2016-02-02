@@ -111,7 +111,8 @@ function Samaritan($settings) {
 		send : {
 			file : 'file.php',
 			as : 'json',
-			callback:null
+			callback:null,
+			limit:0,
 		},
 		frequency : 10000,
 		timef : true,
@@ -130,52 +131,65 @@ function Samaritan($settings) {
 	var send = function($file, $data,$callback) {
 		var sent;
 		var callback = (!isEmpty($callback)&& typeof $callback == 'function')?$callback:null;
+		var counter = 0;
 		interval = setInterval(
 				function() {
-					sent = $
-							.post($file, {
-								data : $data,
-								seperator : settings.seperator
-							})
-							/*.ajax({
-								url:$file,
-								data:$data,
-								beforeSend: function(){
-									console.warn(typeof $data);
-								},
+					if (isEmpty($data)) {
+						console.warn('There is no data to send');
+						counter++;
+						if(settings.send.limit != 0 && counter == settings.send.limit){
+							self.stop();
+						}
+					}else{
+						sent = $
+								/*.post($file, {
+									data : $data,
+									seperator : settings.seperator
+								})*/
+								.ajax({
+									type:'post',
+									contentType:'application/json',
+									processData:false,
+									dataType:'text',
+									url:$file,
+									data:$data,
+									beforeSend: function(){
+										console.warn(typeof $data);
+									},
 
-							})*/
-							.done(
-									function(data) {
-										console.debug('Data has been sent to "'
-												+ $file + '"');
-										console.log(data);
-										callback;
-										if (settings.clearAfterSent) {
-											try {
-												clear();
-											} catch (err) {
-												console
-														.error('Observed Array couldnot be cleared!');
+								})
+								.done(
+										function(data) {
+											console.debug('Data has been sent to "'
+													+ $file + '"');
+											console.log(data);
+											callback;
+											if (settings.clearAfterSent) {
+												try {
+													clear();
+												} catch (err) {
+													console
+															.error('Observed Array couldnot be cleared!');
+												}
+												return true;
 											}
-											return true;
-										}
-										
-									})
-							.fail(
-									function(xhr) {
-										errMess = (xhr.status == 404) ? 'File "'
-												+ $file + '" not found! (404)'
-												: (xhr.status == 0 && xhr.statusText == 'error') ? 'Acces denied for file "'
-														+ $file
-														+ '" (CROS Rules are violated)'
-														: 'status: '
-																+ xhr.status
-																+ ' Status Text: '
-																+ xhr.statusText;
-										console.error(errMess);
-										self.stop();
-									});
+											
+										})
+								.fail(
+										function(xhr) {
+											errMess = (xhr.status == 404) ? 'File "'
+													+ $file + '" not found! (404)'
+													: (xhr.status == 0 && xhr.statusText == 'error') ? 'Acces denied for file "'
+															+ $file
+															+ '" (CROS Rules are violated)'
+															: 'status: '
+																	+ xhr.status
+																	+ ' Status Text: '
+																	+ xhr.statusText;
+											console.error(errMess);
+											self.stop();
+										});
+								}
 				}, settings.frequency);
 		return sent;
 	};
